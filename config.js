@@ -19,11 +19,12 @@ var CONFIG = {
   // 老师邮箱
   TEACHER_EMAIL: "denglaoshi@class20207.com",
 
-  // 三个仓库的域名
+  // 四个仓库的域名
   DOMAINS: {
     login: "https://cqxjw-class7-2020.pages.dev",
     home: "https://cqxjw-class7-2020-2.pages.dev",
-    others: "https://cqxjw-class7-2020-3.pages.dev"
+    others: "https://cqxjw-class7-2020-3.pages.dev",
+    admin: "https://cqxjw-class7-2020-4.pages.dev"
   },
 
   // 页面跳转地址（跨仓库使用完整URL）
@@ -37,17 +38,24 @@ var CONFIG = {
     visitor: "https://cqxjw-class7-2020-2.pages.dev/visitor.html",
     userHome: "https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html",
     adminHome: "https://cqxjw-class7-2020-2.pages.dev/admin-main.html",
-    // 其他功能仓库
-    adminSettings: "https://cqxjw-class7-2020-3.pages.dev/admin-settings.html",
-    settings: "https://cqxjw-class7-2020-3.pages.dev/settings.html",
-    changePassword: "https://cqxjw-class7-2020-3.pages.dev/change-password.html",
+    // 管理设置仓库（仓库4）
+    adminSettings: "https://cqxjw-class7-2020-4.pages.dev/admin-settings.html",
+    settings: "https://cqxjw-class7-2020-4.pages.dev/settings.html",
+    changePassword: "https://cqxjw-class7-2020-4.pages.dev/change-password.html",
+    adminFeedback: "https://cqxjw-class7-2020-4.pages.dev/admin-feedback.html",
+    adminLeaderboard: "https://cqxjw-class7-2020-4.pages.dev/admin-leaderboard.html",
+    pptViewer: "https://cqxjw-class7-2020-4.pages.dev/ppt-viewer.html",
+    pptShow: "https://cqxjw-class7-2020-4.pages.dev/ppt-show.html",
+    // 其他功能仓库（仓库3）
     message: "https://cqxjw-class7-2020-3.pages.dev/message.html",
     contactAdmin: "https://cqxjw-class7-2020-3.pages.dev/contact-admin.html",
+    conversation: "https://cqxjw-class7-2020-3.pages.dev/conversation.html",
     about: "https://cqxjw-class7-2020-3.pages.dev/about.html",
     gallery: "https://cqxjw-class7-2020-3.pages.dev/gallery.html",
     videos: "https://cqxjw-class7-2020-3.pages.dev/videos.html",
     classwall: "https://cqxjw-class7-2020-3.pages.dev/classwall.html",
-    developers: "https://cqxjw-class7-2020-3.pages.dev/developers.html"
+    developers: "https://cqxjw-class7-2020-3.pages.dev/developers.html",
+    classmates: "https://cqxjw-class7-2020-3.pages.dev/classmates.html"
   },
 
   // 登录保持天数
