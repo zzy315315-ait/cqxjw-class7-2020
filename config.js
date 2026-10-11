@@ -19,25 +19,35 @@ var CONFIG = {
   // 老师邮箱
   TEACHER_EMAIL: "denglaoshi@class20207.com",
 
-  // 页面跳转地址
+  // 三个仓库的域名
+  DOMAINS: {
+    login: "https://cqxjw-class7-2020.pages.dev",
+    home: "https://cqxjw-class7-2020-2.pages.dev",
+    others: "https://cqxjw-class7-2020-3.pages.dev"
+  },
+
+  // 页面跳转地址（跨仓库使用完整URL）
   PAGES: {
+    // 登录页仓库（当前仓库）
     login: "index.html",
     internalLogin: "internal-login.html",
     adminLogin: "admin-login.html",
-    visitor: "visitor.html",
-    userHome: "a3x7k2m9p4q8r3t6w1y5u0i2o4.html",
-    adminHome: "admin-main.html",
-    adminSettings: "admin-settings.html",
-    settings: "settings.html",
-    changePassword: "change-password.html",
-    message: "message.html",
-    contactAdmin: "contact-admin.html",
     register: "register.html",
-    about: "about.html",
-    gallery: "gallery.html",
-    videos: "videos.html",
-    classwall: "classwall.html",
-    developers: "developers.html"
+    // 主页仓库
+    visitor: "https://cqxjw-class7-2020-2.pages.dev/visitor.html",
+    userHome: "https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html",
+    adminHome: "https://cqxjw-class7-2020-2.pages.dev/admin-main.html",
+    // 其他功能仓库
+    adminSettings: "https://cqxjw-class7-2020-3.pages.dev/admin-settings.html",
+    settings: "https://cqxjw-class7-2020-3.pages.dev/settings.html",
+    changePassword: "https://cqxjw-class7-2020-3.pages.dev/change-password.html",
+    message: "https://cqxjw-class7-2020-3.pages.dev/message.html",
+    contactAdmin: "https://cqxjw-class7-2020-3.pages.dev/contact-admin.html",
+    about: "https://cqxjw-class7-2020-3.pages.dev/about.html",
+    gallery: "https://cqxjw-class7-2020-3.pages.dev/gallery.html",
+    videos: "https://cqxjw-class7-2020-3.pages.dev/videos.html",
+    classwall: "https://cqxjw-class7-2020-3.pages.dev/classwall.html",
+    developers: "https://cqxjw-class7-2020-3.pages.dev/developers.html"
   },
 
   // 登录保持天数

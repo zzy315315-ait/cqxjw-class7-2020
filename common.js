@@ -150,12 +150,19 @@ function logout(){
 
 // 返回按钮：根据登录状态和访客模式自动判断
 function goBack(){
+  var targetUrl;
   if(isVisitorMode()){
-    location.href = CONFIG ? CONFIG.PAGES.visitor : 'visitor.html';
+    targetUrl = CONFIG ? CONFIG.PAGES.visitor : 'visitor.html';
   }else if(isAdminUser()){
-    location.href = CONFIG ? CONFIG.PAGES.adminHome : 'admin-main.html';
+    targetUrl = CONFIG ? CONFIG.PAGES.adminHome : 'admin-main.html';
   }else{
-    location.href = CONFIG ? CONFIG.PAGES.userHome : 'a3x7k2m9p4q8r3t6w1y5u0i2o4.html';
+    targetUrl = CONFIG ? CONFIG.PAGES.userHome : 'a3x7k2m9p4q8r3t6w1y5u0i2o4.html';
+  }
+  // 跨域名跳转时带上加密的身份验证信息
+  if(targetUrl.indexOf('http') === 0 && typeof CrossDomainAuth !== 'undefined'){
+    location.href = CrossDomainAuth.buildUrl(targetUrl);
+  }else{
+    location.href = targetUrl;
   }
 }
 
@@ -200,4 +207,115 @@ function disableSelection(){
 // 页面加载完成后自动执行
 document.addEventListener('DOMContentLoaded', function(){
   disableSelection();
+  // 自动检查URL中的auth参数，恢复跨域名传递的登录状态
+  CrossDomainAuth.receiveFromUrl();
 });
+
+// ============================================================
+// 跨域名身份验证传递模块
+// 用于三个仓库（不同域名）之间安全传递用户登录状态
+// ============================================================
+var CrossDomainAuth = (function() {
+  var SECRET_KEY = "cxjw2020class7star_crossdomain";
+
+  function encrypt(data) {
+    try {
+      var json = JSON.stringify(data);
+      var xor = "";
+      for (var i = 0; i < json.length; i++) {
+        xor += String.fromCharCode(json.charCodeAt(i) ^ SECRET_KEY.charCodeAt(i % SECRET_KEY.length));
+      }
+      return btoa(unescape(encodeURIComponent(xor)));
+    } catch(e) { return ""; }
+  }
+
+  function decrypt(encoded) {
+    try {
+      var xor = decodeURIComponent(escape(atob(encoded)));
+      var json = "";
+      for (var i = 0; i < xor.length; i++) {
+        json += String.fromCharCode(xor.charCodeAt(i) ^ SECRET_KEY.charCodeAt(i % SECRET_KEY.length));
+      }
+      return JSON.parse(json);
+    } catch(e) { return null; }
+  }
+
+  function getCurrentUser() {
+    try {
+      var sess = JSON.parse(localStorage.getItem('sb_session') || sessionStorage.getItem('sb_session') || 'null');
+      var adm = JSON.parse(localStorage.getItem('sb_admin') || 'null');
+      return sess || adm;
+    } catch(e) { return null; }
+  }
+
+  // 生成带加密用户信息的跳转URL
+  function buildUrl(baseUrl) {
+    var user = getCurrentUser();
+    var data;
+    if (!user) {
+      data = { is_guest: true, name: "访客", timestamp: Date.now() };
+    } else {
+      data = {
+        is_guest: false,
+        uid: user.uid || "",
+        name: user.name || "",
+        student_id: user.student_id || "",
+        email: user.email || "",
+        role: user.role || "student",
+        token: user.token || "",
+        exp: user.exp || 0,
+        timestamp: Date.now()
+      };
+    }
+    var encoded = encrypt(data);
+    return baseUrl + (baseUrl.indexOf('?') >= 0 ? '&' : '?') + "auth=" + encodeURIComponent(encoded);
+  }
+
+  // 从URL接收并解密用户信息，保存到本地
+  function receiveFromUrl() {
+    try {
+      var urlParams = new URLSearchParams(window.location.search);
+      var encoded = urlParams.get('auth');
+      if (!encoded) return false;
+      var data = decrypt(encoded);
+      if (!data) return false;
+      if (data.is_guest) {
+        sessionStorage.setItem('mode', 'visitor');
+        sessionStorage.setItem('visitor_verified', '1');
+        localStorage.setItem('mode', 'visitor');
+      } else {
+        // 保存登录用户信息
+        var userData = {
+          uid: data.uid,
+          name: data.name,
+          student_id: data.student_id,
+          email: data.email,
+          role: data.role,
+          token: data.token,
+          exp: data.exp
+        };
+        localStorage.setItem('sb_session', JSON.stringify(userData));
+        localStorage.setItem('logged_in', '1');
+        if (data.exp) localStorage.setItem('login_expire', data.exp);
+        if (data.role === 'admin' || data.role === 'super_admin') {
+          localStorage.setItem('is_admin', '1');
+          localStorage.setItem('sb_admin', JSON.stringify(userData));
+        }
+      }
+      // 清除URL中的auth参数，避免刷新时重复处理
+      if (window.history && window.history.replaceState) {
+        var cleanUrl = window.location.pathname + window.location.hash;
+        window.history.replaceState({}, document.title, cleanUrl);
+      }
+      return true;
+    } catch(e) { return false; }
+  }
+
+  return {
+    encrypt: encrypt,
+    decrypt: decrypt,
+    getCurrentUser: getCurrentUser,
+    buildUrl: buildUrl,
+    receiveFromUrl: receiveFromUrl
+  };
+})();
