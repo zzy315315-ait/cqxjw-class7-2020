@@ -162,7 +162,7 @@ if(!sessionStorage.getItem('from_login')){
 
 var _u = "https://ekfntkpjqzmkibdimtru.supabase.co";
 var _k = "sb_publishable_Z3wpxD9ZRbXm9-gPPQOGZg_KKhr_yIs";
-var _r = "a3x7k2m9p4q8r3t6w1y5u0i2o4.html";
+var _r = "https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html";
 var _adminUid = "919f3af0-801d-4d7b-87b4-03bedc9d2896";
 
 // 名字→学号映射表
@@ -365,7 +365,7 @@ function doLogin(){
         document.getElementById("modalBox").classList.add("closing");
         // 普通用户默认不保持登录（使用sessionStorage，关闭浏览器自动退出）
         sessionStorage.setItem('logged_in', '1');
-        var _target = _forceChangePwd ? 'change-password.html?force=1' : _r;
+        var _target = _forceChangePwd ? 'https://cqxjw-class7-2020-4.pages.dev/change-password.html?force=1' : _r;
         if(_forceChangePwd){
           sessionStorage.setItem('force_change_pwd', '1');
         }
