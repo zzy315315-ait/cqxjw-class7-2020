@@ -1,0 +1,7 @@
+# 排除系统文件
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# 视频文件走单独通道
+videos/

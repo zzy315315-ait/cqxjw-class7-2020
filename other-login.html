@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="xiaohui.png">
+<title>其他用户登录 - 谢家湾学校2020级7班 · 毕业记忆</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  input,textarea{user-select:text;-webkit-user-select:text}
+  html,body{width:100%;height:100%;overflow:hidden;font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+
+  .bg{position:fixed;inset:0;z-index:-2;background:url('1.jpg') center/cover no-repeat;filter:blur(3px) brightness(0.65) saturate(1.15);transform:scale(1.06)}
+  .bg-mask{position:fixed;inset:0;z-index:-1;background:linear-gradient(135deg,rgba(8,12,38,0.55) 0%,rgba(18,8,48,0.45) 50%,rgba(5,10,32,0.65) 100%)}
+  .bg-glow{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  .bg-glow::before,.bg-glow::after{content:'';position:absolute;width:500px;height:500px;border-radius:50%;filter:blur(100px);opacity:.18;animation:floatGlow 12s ease-in-out infinite}
+  .bg-glow::before{background:#4a90ff;top:-100px;left:-100px;animation-delay:0s}
+  .bg-glow::after{background:#c66bff;bottom:-100px;right:-100px;animation-delay:-6s}
+  @keyframes floatGlow{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(60px,40px) scale(1.1)}66%{transform:translate(-40px,60px) scale(.95)}}
+
+  /* 左上角 */
+  .top-left{position:fixed;top:20px;left:24px;z-index:10;display:flex;align-items:center;gap:10px;animation:fadeInDown 1s .2s both}
+  .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;box-shadow:0 2px 10px rgba(0,0,0,0.35);border:2px solid rgba(255,255,255,0.25);flex-shrink:0}
+  .back-btn{color:#c8d4f0;font-size:14px;font-weight:500;letter-spacing:1px;text-decoration:none;cursor:pointer;transition:all .25s;text-shadow:0 2px 10px rgba(0,0,0,0.5);display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(10px)}
+  .back-btn:hover{color:#fff;background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);transform:translateX(-3px)}
+  @keyframes fadeInDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+
+  .clock{position:fixed;top:24px;right:28px;z-index:10;color:#e8efff;font-size:14px;font-weight:500;letter-spacing:1px;text-shadow:0 2px 12px rgba(0,0,0,0.5);text-align:right;line-height:1.6;padding:8px 14px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(10px)}
+  .clock .weekday{font-size:12px;color:#a8b8e0}
+
+  .wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{width:100%;max-width:410px;background:rgba(20,25,50,0.45);backdrop-filter:blur(28px) saturate(1.8);-webkit-backdrop-filter:blur(28px) saturate(1.8);border:1px solid rgba(255,255,255,0.18);border-radius:26px;padding:46px 38px 34px;box-shadow:0 24px 70px rgba(0,0,0,0.4),0 0 1px rgba(255,255,255,0.3) inset,0 0 60px rgba(74,144,255,0.08);animation:cardIn 1s cubic-bezier(.22,1,.36,1) both;position:relative;overflow:hidden}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#5ba8ff,#c66bff,transparent);animation:shimmer 3s ease-in-out infinite}
+  @keyframes shimmer{0%,100%{opacity:.5}50%{opacity:1}}
+  @keyframes cardIn{from{opacity:0;transform:translateY(40px) scale(.94);filter:blur(8px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+
+  .title{text-align:center;font-size:34px;font-weight:800;letter-spacing:6px;background:linear-gradient(135deg,#6bb5ff 0%,#7b8bff 40%,#b07bff 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;filter:drop-shadow(0 4px 20px rgba(91,168,255,0.35));animation:titleGlow 3s ease-in-out infinite}
+  @keyframes titleGlow{0%,100%{filter:drop-shadow(0 4px 20px rgba(91,168,255,0.35))}50%{filter:drop-shadow(0 4px 30px rgba(176,123,255,0.5))}}
+  .subtitle{text-align:center;color:#7a8ab5;font-size:11px;letter-spacing:3px;margin-bottom:34px;animation:fadeInUp 1s .2s both}
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  .field{margin-bottom:20px;animation:fadeInUp 1s both}
+  .field:nth-of-type(1){animation-delay:.35s}
+  .field:nth-of-type(2){animation-delay:.5s}
+  .field label{display:block;color:#9aa8d0;font-size:12px;font-weight:600;margin-bottom:8px;letter-spacing:1.5px;text-transform:uppercase}
+  .field input{width:100%;padding:14px 18px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#e8efff;font-size:15px;outline:none;transition:all .3s cubic-bezier(.22,1,.36,1)}
+  .field input::placeholder{color:#5a6890}
+  .field input:focus{border-color:rgba(91,168,255,0.7);background:rgba(255,255,255,0.1);box-shadow:0 0 0 4px rgba(91,168,255,0.12),0 0 20px rgba(91,168,255,0.15)}
+
+  .btn-login{width:100%;padding:15px;border-radius:14px;border:none;cursor:pointer;background:linear-gradient(135deg,#4a90ff,#6b5bff,#8b5bff);background-size:200% 200%;color:#fff;font-size:15px;font-weight:700;letter-spacing:6px;margin-top:10px;transition:all .3s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;box-shadow:0 8px 28px rgba(74,144,255,0.4);animation:fadeInUp 1s .65s both,gradientMove 4s ease infinite}
+  @keyframes gradientMove{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+  .btn-login:hover{transform:translateY(-3px);box-shadow:0 14px 40px rgba(74,144,255,0.55)}
+  .btn-login:active{transform:translateY(-1px) scale(.98)}
+  .btn-login:disabled{opacity:.65;cursor:not-allowed;transform:none}
+  .btn-login::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);transition:left .7s}
+  .btn-login:hover::after{left:130%}
+
+  .remember-me{display:flex;align-items:center;gap:8px;margin:4px 0 14px;cursor:pointer}
+  .remember-me input[type="checkbox"]{width:16px;height:16px;accent-color:#4a90ff;cursor:pointer}
+  .remember-me label{font-size:12px;color:#7a8ab5;cursor:pointer;letter-spacing:.5px}
+  .remember-me label:hover{color:#9aa8d0}
+
+  .tip{text-align:center;margin-top:20px;color:#5a6890;font-size:11px;letter-spacing:1px;line-height:1.8;animation:fadeInUp 1s .8s both}
+  .tip b{color:#7a8ab5;font-weight:600}
+
+  .modal-mask{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px)}
+  .modal-mask.show{display:flex;animation:fadeIn .35s both}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .modal{background:rgba(22,26,52,0.97);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.15);border-radius:22px;padding:32px 36px;max-width:360px;width:90%;text-align:center;animation:modalIn .5s cubic-bezier(.34,1.56,.64,1) both;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+  @keyframes modalIn{from{opacity:0;transform:scale(.8) translateY(30px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  .modal.success{border-color:rgba(107,255,155,0.5);box-shadow:0 0 50px rgba(107,255,155,0.2),0 20px 60px rgba(0,0,0,0.5)}
+  .modal.error{border-color:rgba(255,107,107,0.5);box-shadow:0 0 50px rgba(255,107,107,0.2),0 20px 60px rgba(0,0,0,0.5)}
+  .modal.warn{border-color:rgba(255,200,80,0.5);box-shadow:0 0 50px rgba(255,200,80,0.15),0 20px 60px rgba(0,0,0,0.5)}
+  .modal .icon{font-size:48px;margin-bottom:14px;animation:iconPop .5s cubic-bezier(.34,1.56,.64,1) both}
+  @keyframes iconPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal .msg{color:#e8efff;font-size:15px;line-height:1.7;margin-bottom:22px}
+  .modal .msg .detail{display:block;margin-top:10px;font-size:12px;color:#8a98c0;line-height:1.6}
+  .modal .msg .hint{display:block;margin-top:8px;font-size:12px;color:#7ab8ff;font-style:italic}
+  .modal .ok-btn{padding:11px 40px;border-radius:12px;border:none;cursor:pointer;background:linear-gradient(135deg,#4a90ff,#6b5bff);color:#fff;font-size:14px;font-weight:600;letter-spacing:2px;transition:all .25s;box-shadow:0 4px 16px rgba(74,144,255,0.35)}
+  .modal .ok-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(74,144,255,0.5)}
+  .modal .ok-btn:active{transform:scale(.97)}
+  .modal.success .ok-btn{background:linear-gradient(135deg,#4ade80,#22c55e);box-shadow:0 4px 16px rgba(34,197,94,0.35)}
+  .modal.error .ok-btn{background:linear-gradient(135deg,#f87171,#ef4444);box-shadow:0 4px 16px rgba(239,68,68,0.35)}
+  .modal.warn .ok-btn{background:linear-gradient(135deg,#fbbf24,#f59e0b);box-shadow:0 4px 16px rgba(245,158,11,0.35)}
+
+  /* 弹窗消失动画 */
+  .modal-mask.closing{animation:fadeOut .45s ease-in forwards}
+  .modal.closing{animation:modalOut .45s ease-in forwards}
+  @keyframes fadeOut{from{opacity:1}to{opacity:0}}
+  @keyframes modalOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.88) translateY(-15px)}}
+
+  .loading{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .field input.shake{animation:shake .4s;border-color:rgba(255,107,107,0.6)!important}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+  @media(max-width:480px){
+    .back-btn{font-size:12px;top:14px;left:14px;padding:6px 10px}
+    .clock{font-size:12px;top:14px;right:14px;padding:6px 10px}
+    .clock .weekday{font-size:10px}
+    .card{padding:34px 26px 26px;border-radius:22px}
+    .title{font-size:28px;letter-spacing:4px}
+  }
+</style>
+<script src="bgm.js"></script>
+</head>
+<body>
+<script>
+// 设置人机验证通过标记，防止返回登录页时被重新验证
+sessionStorage.setItem('_v', '1');
+</script>
+
+<div class="bg"></div>
+<div class="bg-mask"></div>
+<div class="bg-glow"></div>
+
+<div class="top-left">
+  <img src="xiaohui.png" class="brand-logo" alt="重庆谢家湾学校校徽">
+  <a class="back-btn" onclick="goBack()">← 返回</a>
+</div>
+
+<div class="clock">
+  <div class="weekday" id="weekday">星期--</div>
+  <div id="time">--:--:--</div>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="title">欢迎回来</div>
+    <div class="subtitle">其他用户登录</div>
+    <div class="field">
+      <label>账号</label>
+      <input type="text" id="accInput" placeholder="输入名字或者邮箱都行" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>密码</label>
+      <input type="password" id="pwdInput" placeholder="输入你的密码" autocomplete="off">
+    </div>
+    <button class="btn-login" id="loginBtn" onclick="doLogin()">进 入</button>
+    <div class="tip">其他用户登录入口<br>注册申请通过后使用此入口登录</div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalMask">
+  <div class="modal" id="modalBox">
+    <div class="icon" id="modalIcon">ℹ️</div>
+    <div class="msg" id="modalMsg">提示内容</div>
+    <button class="ok-btn" onclick="closeModal()">确定</button>
+  </div>
+</div>
+
+<script>
+/* 直达检测：不是从主登录页跳转过来的，自动跳回主登录页 */
+if(!sessionStorage.getItem('from_login')){
+  window.location.href = "index.html";
+}
+
+/* ============================================================
+   其他用户登录 - 支持 名字/邮箱 两种输入
+   ============================================================ */
+
+var _u = "https://ekfntkpjqzmkibdimtru.supabase.co";
+var _k = "sb_publishable_Z3wpxD9ZRbXm9-gPPQOGZg_KKhr_yIs";
+var _r = "a3x7k2m9p4q8r3t6w1y5u0i2o4.html";
+var _adminUid = "919f3af0-801d-4d7b-87b4-03bedc9d2896";
+
+// 名字→学号映射表
+var _m = {
+  "杨明叡":"1","李梓豪":"2","陶柏彦":"3","李镇宇":"4","张清源":"5","周兴":"6",
+  "唐颢原":"7","罗楚天":"8","李昊辰":"9","陈俊宇":"10","刘培正":"11","周子义":"12",
+  "张泽棵":"13","李宗潮":"14","孙榆桐":"15","刘琨正":"16","陈俊晓":"17","李博宇":"18",
+  "毛艺杰":"19","罗迦蓝":"20","赵梓成":"21","陆蔼琳":"22","叶梦涵":"23","种沁佳":"24",
+  "王正玟":"25","黄可嘉":"26","陈夏":"27","周芷觅":"28","王乙棠":"29","杨云迪":"30",
+  "孟姝菡":"31","莫钕忱":"32","黄圣意":"33","叶诗颖":"34","郭梓琳":"35","官琬钰":"36",
+  "熊湙铃":"37","吴苓萁":"38","张景怡":"39","樊禹希":"40","陈以柔":"41","陈诗颖":"42"
+};
+
+// 检测输入格式
+function _f(_x){
+  if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(_x)) return "email";
+  if(/^\d+$/.test(_x)) return "sid";
+  return "name";
+}
+
+// 转换为邮箱
+function _e(_x, _t){
+  if(_t === "email") return _x;
+  if(_t === "sid") return _x + "@class20207.com";
+  // name - 先去除首尾空格，统一处理
+  _x = _x.trim();
+  // 邓老师检测
+  if(_x === "邓老师" || (_x.indexOf("邓") >= 0 && _x.length <= 4)){
+    return "denglaoshi@class20207.com";
+  }
+  // 精确匹配
+  var _s = _m[_x];
+  if(_s) return _s + "@class20207.com";
+  // 模糊匹配：去除空格后匹配
+  var _clean = _x.replace(/\s/g, "");
+  for(var _n in _m){
+    if(_n.replace(/\s/g, "") === _clean){
+      return _m[_n] + "@class20207.com";
+    }
+  }
+  // 包含匹配：输入的名字是映射表中名字的子串（或反之）
+  for(var _n2 in _m){
+    if(_n2.indexOf(_x) >= 0 || _x.indexOf(_n2) >= 0){
+      return _m[_n2] + "@class20207.com";
+    }
+  }
+  return null;
+}
+
+// 判断角色（admin 或 super_admin 都算管理员，都会被卡住）
+function _role(_uid, _email, _meta){
+  // 固定UID白名单
+  if(_uid && _uid.toLowerCase() === _adminUid.toLowerCase()) return "admin";
+  // user_metadata.role 检查
+  if(_meta && _meta.role){
+    var _r = _meta.role.toLowerCase();
+    if(_r === "admin" || _r === "super_admin") return "admin";
+    if(_r === "unrestricted") return "unrestricted";
+    if(_r === "other") return "other";
+    if(_r === "teacher") return "teacher";
+  }
+  // 从邮箱判断老师/学生
+  if(_email === "denglaoshi@class20207.com") return "teacher";
+  // 其他用户（非班级邮箱）默认为other
+  if(_email && _email.indexOf('@class20207.com') < 0 && _email !== "denglaoshi@class20207.com"){
+    return "other";
+  }
+  return "student";
+}
+
+// 根据邮箱获取显示名
+function _dn(_email){
+  if(_email === "denglaoshi@class20207.com") return "邓老师";
+  var _sid = _email.split("@")[0];
+  for(var _n in _m){
+    if(_m[_n] === _sid) return _n;
+  }
+  return _sid;
+}
+
+// 登录
+function doLogin(){
+  var _acc = document.getElementById("accInput").value.trim();
+  var _pwd = document.getElementById("pwdInput").value;
+  var _btn = document.getElementById("loginBtn");
+  var _accEl = document.getElementById("accInput");
+  var _pwdEl = document.getElementById("pwdInput");
+
+  // ===== 登录频率限制：一分钟内失败超5次，封禁一分钟 =====
+  var _fails = JSON.parse(localStorage.getItem('login_fails_internal') || '[]');
+  var _now = Date.now();
+  _fails = _fails.filter(function(t){ return _now - t < 60000; });
+  localStorage.setItem('login_fails_internal', JSON.stringify(_fails));
+  if(_fails.length >= 5){
+    var _wait = Math.ceil((60000 - (_now - _fails[0])) / 1000);
+    showModal("error","⏳","登录太频繁了","请等待 " + _wait + " 秒后再试<span class='detail'>一分钟内最多尝试5次，防止暴力破解</span>");
+    return;
+  }
+
+  if(!_acc){
+    _accEl.classList.add("shake");
+    setTimeout(function(){_accEl.classList.remove("shake")},400);
+    showModal("error","🤔","还没填名字呢","名字、学号或者邮箱，总得填一个吧");
+    return;
+  }
+  if(!_pwd){
+    _pwdEl.classList.add("shake");
+    setTimeout(function(){_pwdEl.classList.remove("shake")},400);
+    showModal("error","🔑","密码还没填","密码不能为空哦");
+    return;
+  }
+
+  var _type = _f(_acc);
+  var _email = _e(_acc, _type);
+  if(!_email){
+    _accEl.classList.add("shake");
+    setTimeout(function(){_accEl.classList.remove("shake")},400);
+    showModal("error","🔍","没找到这个人","班上好像没有叫这个名字的同学，检查一下有没有写错<span class='detail'>名字、学号、邮箱都可以哦</span>");
+    return;
+  }
+
+  _btn.disabled = true;
+  _btn.innerHTML = '<span class="loading"></span>验证中...';
+
+  fetch(_u + "/auth/v1/token?grant_type=password", {
+    method:"POST",
+    headers:{"apikey":_k,"Content-Type":"application/json"},
+    body:JSON.stringify({email:_email, password:_pwd})
+  })
+  .then(function(res){ return res.json().then(function(d){ return {status:res.status, data:d}; }); })
+  .then(function(result){
+    _btn.disabled = false;
+    _btn.innerHTML = "登 录";
+
+    if(result.status === 200 && result.data.access_token){
+      var _uid = result.data.user ? result.data.user.id : "";
+      var _meta = result.data.user ? result.data.user.user_metadata : null;
+      var _r2 = _role(_uid, _email, _meta);
+      var _name = _dn(_email);
+
+      // 管理员误入 → 卡住
+      if(_r2 === "admin"){
+        showModal("warn","🔒","哎，你是管理员","这个入口是给同学和老师用的<span class='detail'>返回主页，点「是管理员？点这里」进去吧</span>");
+        return; // 不跳转，不保存session
+      }
+
+      // 保存会话
+      try{
+        var _sid = '';
+        if(_email && _email.indexOf('@class20207.com') > 0 && _email !== 'denglaoshi@class20207.com'){
+          _sid = _email.split('@')[0];
+        }
+        localStorage.setItem("sb_session", JSON.stringify({
+          token:result.data.access_token,
+          uid:_uid,
+          name:_name,
+          role:_r2,
+          email:_email,
+          student_id:_sid,
+          exp:Date.now() + 3600000
+        }));
+      }catch(e){}
+
+      // 登录成功，清空失败记录
+      localStorage.removeItem('login_fails_internal');
+
+      // ===== 登录次数检查：第一次提醒改密码，第二次强制改密码 =====
+      var _pwdChanged = localStorage.getItem('pwd_changed_' + _uid);
+      var _loginCount = parseInt(localStorage.getItem('login_count_' + _uid) || '0') + 1;
+      localStorage.setItem('login_count_' + _uid, String(_loginCount));
+      var _forceChangePwd = false;
+      var _pwdHint = '';
+      if(!_pwdChanged && _r2 !== 'unrestricted'){
+        if(_loginCount >= 2){
+          _forceChangePwd = true;
+          _pwdHint = '为了账号安全，请先修改默认密码';
+        }else if(_loginCount === 1){
+          _pwdHint = '建议修改默认密码，保护账号安全';
+        }
+      }
+
+      // 根据登录方式显示不同提示
+      if(_type === "email"){
+        var _hint = "";
+        if(_r2 === "teacher"){
+          _hint = "虽然我不知道你是怎么知道你自己的邮箱的，但是下次登录的时候请用名字";
+        }else{
+          _hint = "虽然我不知道你是怎么知道你自己的邮箱的，但是下次登录的时候请用名字或者学号";
+        }
+        if(_pwdHint) _hint += '<br><span style="color:#fbbf24">' + _pwdHint + '</span>';
+        showModal("success","✅","登录成功，欢迎" + _name + "！",_hint);
+      }else{
+        var _detail = "欢迎回来，" + _name + "！";
+        if(_pwdHint) _detail += '<br><span style="color:#fbbf24">' + _pwdHint + '</span>';
+        showModal("success","✅","登录成功",_detail);
+      }
+      // 停留2秒后淡出，再跳转
+      setTimeout(function(){
+        document.getElementById("modalMask").classList.add("closing");
+        document.getElementById("modalBox").classList.add("closing");
+        // 普通用户默认不保持登录（使用sessionStorage，关闭浏览器自动退出）
+        sessionStorage.setItem('logged_in', '1');
+        var _target = _forceChangePwd ? 'change-password.html' : _r;
+        setTimeout(function(){ window.location.href = _target; }, 450);
+      }, 2000);
+    }else{
+      // 记录登录失败时间戳
+      var _fails = JSON.parse(localStorage.getItem('login_fails_internal') || '[]');
+      _fails.push(Date.now());
+      localStorage.setItem('login_fails_internal', JSON.stringify(_fails));
+
+      var _err = "密码不对哦，再想想？";
+      if(result.data && result.data.error_description){
+        _err = result.data.error_description;
+      }
+      _pwdEl.classList.add("shake");
+      setTimeout(function(){_pwdEl.classList.remove("shake")},400);
+      showModal("error","❌","进不去","密码不对哦，再想想？<span class='detail'>默认密码是学号，改过的话用新密码</span>");
+    }
+  })
+  .catch(function(err){
+    _btn.disabled = false;
+    _btn.innerHTML = "进 入";
+    showModal("error","🌐","网不太好","连不上服务器，检查一下网络再试吧<span class='detail'>" + err.message + "</span>");
+  });
+}
+
+function goBack(){ window.location.href = "login.html"; }
+
+function updateClock(){
+  var now = new Date();
+  var weeks = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
+  document.getElementById("weekday").textContent = weeks[now.getDay()];
+  var h = String(now.getHours()).padStart(2,"0");
+  var m = String(now.getMinutes()).padStart(2,"0");
+  var s = String(now.getSeconds()).padStart(2,"0");
+  document.getElementById("time").textContent = h + ":" + m + ":" + s;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+function showModal(type, icon, title, detail){
+  var box = document.getElementById("modalBox");
+  box.className = "modal " + type;
+  document.getElementById("modalIcon").textContent = icon;
+  document.getElementById("modalMsg").innerHTML = title + (detail ? "<span class='detail'>" + detail + "</span>" : "");
+  document.getElementById("modalMask").classList.add("show");
+}
+function closeModal(){ document.getElementById("modalMask").classList.remove("show"); }
+
+document.getElementById("pwdInput").addEventListener("keydown", function(e){
+  if(e.key === "Enter") doLogin();
+});
+document.getElementById("accInput").addEventListener("keydown", function(e){
+  if(e.key === "Enter") document.getElementById("pwdInput").focus();
+});
+</script>
+</body>
+</html>
+
