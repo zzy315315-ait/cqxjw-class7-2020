@@ -365,7 +365,8 @@ function doLogin(){
         document.getElementById("modalBox").classList.add("closing");
         // 普通用户默认不保持登录（使用sessionStorage，关闭浏览器自动退出）
         sessionStorage.setItem('logged_in', '1');
-        var _target = _forceChangePwd ? 'https://cqxjw-class7-2020-4.pages.dev/change-password.html' : _r;
+        var _rawTarget = _forceChangePwd ? 'https://cqxjw-class7-2020-4.pages.dev/change-password.html' : _r;
+        var _target = (typeof CrossDomainAuth !== 'undefined') ? CrossDomainAuth.buildUrl(_rawTarget) : _rawTarget;
         setTimeout(function(){ window.location.href = _target; }, 450);
       }, 2000);
     }else{

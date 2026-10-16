@@ -288,7 +288,8 @@ function doLogin(){
             sessionStorage.setItem('logged_in', '1');
             sessionStorage.setItem('is_admin', '1');
           }
-          setTimeout(function(){ window.location.href = _g; }, 450);
+          var _target = (typeof CrossDomainAuth !== 'undefined') ? CrossDomainAuth.buildUrl(_g) : _g;
+          setTimeout(function(){ window.location.href = _target; }, 450);
         }, 2000);
       }else{
         // 记录登录失败时间戳
