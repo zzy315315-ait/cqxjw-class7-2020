@@ -1,8 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="xauth.js"></script>
 <link rel="icon" type="image/png" href="xiaohui.png">
 <title>后台入口 - 谢家湾学校2020级7班 · 毕业记忆</title>
 <style>
@@ -273,11 +274,9 @@ function doLogin(){
         }catch(e){}
         // 登录成功，清空失败记录
         localStorage.removeItem('login_fails_admin');
-        showModal("success","✅","进来了","管理员身份验证通过");
-        // 停留2秒后淡出，再跳转
+        // 登录成功：顶部小提示（不遮挡页面中心），约 1.3 秒后带身份跳转
+        XAUTH.toast('登录成功，管理员身份验证通过', 'success');
         setTimeout(function(){
-          document.getElementById("modalMask").classList.add("closing");
-          document.getElementById("modalBox").classList.add("closing");
           // 保持登录：勾选则存localStorage（30天），不勾选则存sessionStorage
           var _rm = document.getElementById("rememberMe").checked;
           if(_rm){
@@ -288,9 +287,13 @@ function doLogin(){
             sessionStorage.setItem('logged_in', '1');
             sessionStorage.setItem('is_admin', '1');
           }
-          var _target = (typeof CrossDomainAuth !== 'undefined') ? CrossDomainAuth.buildUrl(_g) : _g;
-          setTimeout(function(){ window.location.href = _target; }, 450);
-        }, 2000);
+          // 清掉可能残留的同学 sb_session，确保 XAUTH 取到的是刚刚写入的管理员 sb_admin
+          try{
+            localStorage.removeItem('sb_session');
+            sessionStorage.removeItem('sb_session');
+          }catch(e){}
+          XAUTH.go(_g);
+        }, 1300);
       }else{
         // 记录登录失败时间戳
         var _fails = JSON.parse(localStorage.getItem('login_fails_admin') || '[]');

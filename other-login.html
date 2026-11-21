@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="xauth.js"></script>
 <link rel="icon" type="image/png" href="xiaohui.png">
 <title>其他用户登录 - 谢家湾学校2020级7班 · 毕业记忆</title>
 <style>
@@ -275,6 +276,10 @@ function doLogin(){
     return;
   }
 
+  // Supabase 当前强制密码≥6位：同学默认密码是学号，输入不足6位的纯数字时自动左侧补0（1 → 000001）
+  var _pwdSend = _pwd;
+  if(/^\d{1,5}$/.test(_pwdSend)){ _pwdSend = ('000000' + _pwdSend).slice(-6); }
+
   var _type = _f(_acc);
   var _email = _e(_acc, _type);
   if(!_email){
@@ -290,7 +295,7 @@ function doLogin(){
   fetch(_u + "/auth/v1/token?grant_type=password", {
     method:"POST",
     headers:{"apikey":_k,"Content-Type":"application/json"},
-    body:JSON.stringify({email:_email, password:_pwd})
+    body:JSON.stringify({email:_email, password:_pwdSend})
   })
   .then(function(res){ return res.json().then(function(d){ return {status:res.status, data:d}; }); })
   .then(function(result){
@@ -330,7 +335,8 @@ function doLogin(){
       localStorage.removeItem('login_fails_internal');
 
       // ===== 登录次数检查：第一次提醒改密码，第二次强制改密码 =====
-      var _pwdChanged = localStorage.getItem('pwd_changed_' + _uid);
+      // 优先从用户元数据（数据库）读取是否已改密码，避免跨域localStorage丢失
+      var _pwdChanged = (_meta && (_meta.password_changed === true || _meta.password_changed === '1')) ? '1' : localStorage.getItem('pwd_changed_' + _uid);
       var _loginCount = parseInt(localStorage.getItem('login_count_' + _uid) || '0') + 1;
       localStorage.setItem('login_count_' + _uid, String(_loginCount));
       var _forceChangePwd = false;
@@ -344,31 +350,25 @@ function doLogin(){
         }
       }
 
-      // 根据登录方式显示不同提示
+      // 登录成功：顶部小提示（不遮挡页面中心），约 1.3 秒后带身份跳转
+      var _okMsg = "登录成功，欢迎" + _name + "！";
       if(_type === "email"){
-        var _hint = "";
-        if(_r2 === "teacher"){
-          _hint = "虽然我不知道你是怎么知道你自己的邮箱的，但是下次登录的时候请用名字";
-        }else{
-          _hint = "虽然我不知道你是怎么知道你自己的邮箱的，但是下次登录的时候请用名字或者学号";
-        }
-        if(_pwdHint) _hint += '<br><span style="color:#fbbf24">' + _pwdHint + '</span>';
-        showModal("success","✅","登录成功，欢迎" + _name + "！",_hint);
-      }else{
-        var _detail = "欢迎回来，" + _name + "！";
-        if(_pwdHint) _detail += '<br><span style="color:#fbbf24">' + _pwdHint + '</span>';
-        showModal("success","✅","登录成功",_detail);
+        _okMsg += _r2 === "teacher" ? "，下次登录请用名字" : "，下次登录请用名字或学号";
       }
-      // 停留2秒后淡出，再跳转
+      if(_pwdHint) _okMsg += " " + _pwdHint;
+      XAUTH.toast(_okMsg, 'success');
+
       setTimeout(function(){
-        document.getElementById("modalMask").classList.add("closing");
-        document.getElementById("modalBox").classList.add("closing");
         // 普通用户默认不保持登录（使用sessionStorage，关闭浏览器自动退出）
         sessionStorage.setItem('logged_in', '1');
-        var _rawTarget = _forceChangePwd ? 'https://cqxjw-class7-2020-4.pages.dev/change-password.html' : _r;
-        var _target = (typeof CrossDomainAuth !== 'undefined') ? CrossDomainAuth.buildUrl(_rawTarget) : _rawTarget;
-        setTimeout(function(){ window.location.href = _target; }, 450);
-      }, 2000);
+        if(_forceChangePwd){
+          sessionStorage.setItem('force_change_pwd', '1');
+          // 强制改密：保留 force=1，XAUTH.go 会自动拼上 auth 参数
+          XAUTH.go('https://cqxjw-class7-2020-4.pages.dev/change-password.html?force=1');
+        }else{
+          XAUTH.go(_r);
+        }
+      }, 1300);
     }else{
       // 记录登录失败时间戳
       var _fails = JSON.parse(localStorage.getItem('login_fails_internal') || '[]');

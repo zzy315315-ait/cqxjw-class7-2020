@@ -5,6 +5,11 @@
 
 (function(){
   try{
+    // 登录页统一绝对地址（跨仓库复制到别的域名时，相对 login.html 会 404）
+    var LOGIN_PAGE = (typeof XAUTH !== 'undefined' && XAUTH.LOGIN_PAGE)
+      ? XAUTH.LOGIN_PAGE
+      : 'https://cqxjw-class7-2020.pages.dev/login.html';
+
     // 检查是否已登录
     var hasSession = localStorage.getItem('sb_session') || localStorage.getItem('sb_admin') || 
                       sessionStorage.getItem('sb_session') || sessionStorage.getItem('sb_admin');
@@ -23,7 +28,7 @@
       if(!isVisitor){
         // 延迟跳转，确保页面其他代码可以正常执行
         setTimeout(function(){
-          window.location.href = 'login.html';
+          window.location.href = LOGIN_PAGE;
         }, 100);
         return;
       }
@@ -36,13 +41,13 @@
         var ADMIN_UIDS = ["919f3af0-801d-4d7b-87b4-03bedc9d2896", "6522e17f-14ea-4f1f-b20d-10457d598fef"];
         if(!adm || !adm.uid || ADMIN_UIDS.indexOf(adm.uid) < 0){
           setTimeout(function(){
-            window.location.href = 'login.html';
+            window.location.href = LOGIN_PAGE;
           }, 100);
           return;
         }
       }catch(e){
         setTimeout(function(){
-          window.location.href = 'login.html';
+          window.location.href = LOGIN_PAGE;
         }, 100);
         return;
       }
