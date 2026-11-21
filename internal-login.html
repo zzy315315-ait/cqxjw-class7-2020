@@ -140,7 +140,7 @@ sessionStorage.setItem('_v', '1');
       <input type="password" id="pwdInput" placeholder="默认是学号哦" autocomplete="off">
     </div>
     <button class="btn-login" id="loginBtn" onclick="doLogin()">进 入</button>
-    <div class="tip">只有2020级7班的同学和老师能进<br>老师的默认密码是 <b>denglaoshi</b></div>
+    <div class="tip">只有2020级7班的同学和老师能进<br>老师的默认密码是 <b>DENGLAOSHI</b><br>同学初始密码：1位学号重复6遍，2位学号重复3遍<br>例：学号 7 → 777777；学号 22 → 222222</div>
   </div>
 </div>
 
@@ -169,10 +169,10 @@ var _adminUid = "919f3af0-801d-4d7b-87b4-03bedc9d2896";
 
 // 名字→学号映射表
 var _m = {
-  "杨明叡":"1","李梓豪":"2","陶柏彦":"3","李镇宇":"4","张清源":"5","周兴":"6",
+  "杨明叡":"1","李梓豪":"2","李镇宇":"4","张清源":"5","周兴":"6",
   "唐颢原":"7","罗楚天":"8","李昊辰":"9","陈俊宇":"10","刘培正":"11","周子义":"12",
   "张泽棵":"13","李宗潮":"14","孙榆桐":"15","刘琨正":"16","陈俊晓":"17","李博宇":"18",
-  "毛艺杰":"19","罗迦蓝":"20","赵梓成":"21","陆蔼琳":"22","叶梦涵":"23","种沁佳":"24",
+  "罗迦蓝":"20","赵梓成":"21","陆蔼琳":"22","叶梦涵":"23","种沁佳":"24",
   "王正玟":"25","黄可嘉":"26","陈夏":"27","周芷觅":"28","王乙棠":"29","杨云迪":"30",
   "孟姝菡":"31","莫钕忱":"32","黄圣意":"33","叶诗颖":"34","郭梓琳":"35","官琬钰":"36",
   "熊湙铃":"37","吴苓萁":"38","张景怡":"39","樊禹希":"40","陈以柔":"41","陈诗颖":"42"
@@ -277,9 +277,7 @@ function doLogin(){
     return;
   }
 
-  // Supabase 当前强制密码≥6位：同学默认密码是学号，输入不足6位的纯数字时自动左侧补0（1 → 000001）
   var _pwdSend = _pwd;
-  if(/^\d{1,5}$/.test(_pwdSend)){ _pwdSend = ('000000' + _pwdSend).slice(-6); }
 
   var _type = _f(_acc);
   var _email = _e(_acc, _type);
@@ -288,6 +286,15 @@ function doLogin(){
     setTimeout(function(){_accEl.classList.remove("shake")},400);
     showModal("error","🔍","没找到这个人","班上好像没有叫这个名字的同学，检查一下有没有写错<span class='detail'>名字、学号、邮箱都可以哦</span>");
     return;
+  }
+
+  // 初始密码规则：学号重复拼满6位（1位写6遍，2位写3遍）。输入的就是原始学号时转换为默认密码；已改过密码则原样提交。
+  var _sid = '';
+  if(_email && _email.indexOf('@class20207.com') > 0 && _email !== 'denglaoshi@class20207.com'){
+    _sid = _email.split('@')[0];
+  }
+  if(_sid && /^\d+$/.test(_pwdSend) && _pwdSend === _sid){
+    var _t = _sid; while(_t.length < 6){ _t += _sid; } _pwdSend = _t.slice(0,6);
   }
 
   _btn.disabled = true;
@@ -317,10 +324,6 @@ function doLogin(){
 
       // 保存会话
       try{
-        var _sid = '';
-        if(_email && _email.indexOf('@class20207.com') > 0 && _email !== 'denglaoshi@class20207.com'){
-          _sid = _email.split('@')[0];
-        }
         localStorage.setItem("sb_session", JSON.stringify({
           token:result.data.access_token,
           uid:_uid,
