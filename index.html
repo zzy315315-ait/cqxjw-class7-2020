@@ -185,6 +185,25 @@
     .card{padding:38px 28px 30px;border-radius:24px}
     .title{font-size:36px;letter-spacing:6px}
   }
+  @media(max-width:380px){
+    .wrap{padding:14px}
+    .card{padding:30px 20px 24px;border-radius:20px}
+    .title{font-size:30px;letter-spacing:4px}
+    .subtitle{margin-bottom:26px}
+    .btn-group{gap:12px;margin-bottom:24px}
+    .btn{padding:13px 16px;font-size:14px}
+  }
+  @media(max-height:500px) and (orientation:landscape){
+    html,body{overflow:auto}
+    .wrap{align-items:flex-start;padding:16px}
+    .card{padding:24px 26px;margin:16px 0;max-width:410px}
+    .title{font-size:26px;letter-spacing:4px;margin-bottom:6px}
+    .subtitle{margin-bottom:18px}
+    .btn-group{gap:10px;margin-bottom:18px}
+    .btn{padding:12px 16px}
+    .brand{top:12px;left:12px}
+    .clock{top:12px;right:12px}
+  }
 </style>
 <script src="captcha-verify.js" defer></script>
 <link rel="stylesheet" href="perf.css">
@@ -324,5 +343,6 @@ document.addEventListener("keydown", function(e){
 });
 </script>
 <script src="perf.js" defer></script>
+<script src="visit-counter.js"></script>
 </body>
 </html>

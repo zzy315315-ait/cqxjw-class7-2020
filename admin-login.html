@@ -103,6 +103,24 @@
     .card{padding:34px 26px 26px;border-radius:22px}
     .title{font-size:26px;letter-spacing:4px}
   }
+  @media(max-width:380px){
+    .wrap{padding:14px}
+    .card{padding:28px 20px 22px;border-radius:18px}
+    .title{font-size:24px;letter-spacing:3px}
+    .field{margin-bottom:14px}
+    .field input{padding:12px 14px;font-size:14px}
+  }
+  @media(max-height:500px) and (orientation:landscape){
+    html,body{overflow:auto}
+    .wrap{align-items:flex-start;padding:16px}
+    .card{padding:22px 26px;margin:16px 0;max-width:410px}
+    .title{font-size:23px;letter-spacing:3px}
+    .subtitle{margin-bottom:16px}
+    .field{margin-bottom:12px}
+    .field input{padding:11px 14px}
+    .btn-login{padding:12px;margin-top:6px}
+    .tip{margin-top:12px}
+  }
 </style>
 <script src="bgm.js" defer></script>
 <link rel="stylesheet" href="perf.css">
@@ -363,6 +381,7 @@ document.getElementById("accInput").addEventListener("keydown", function(e){
 });
 </script>
 <script src="perf.js" defer></script>
+<script src="visit-counter.js"></script>
 </body>
 </html>
 
