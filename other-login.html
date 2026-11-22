@@ -344,11 +344,15 @@ function doLogin(){
       var _pwdChanged = (_meta && (_meta.password_changed === true || _meta.password_changed === '1')) ? '1' : localStorage.getItem('pwd_changed_' + _uid);
       var _loginCount = parseInt(localStorage.getItem('login_count_' + _uid) || '0') + 1;
       localStorage.setItem('login_count_' + _uid, String(_loginCount));
+      var _forcePending = localStorage.getItem('force_pending_' + _uid) === '1';
       var _forceChangePwd = false;
       var _pwdHint = '';
-      if(!_pwdChanged && _r2 !== 'unrestricted'){
-        if(_loginCount >= 2){
+      if(_pwdChanged){
+        try{ localStorage.removeItem('force_pending_' + _uid); }catch(e){}
+      }else if(_r2 !== 'unrestricted'){
+        if(_forcePending || _loginCount >= 2){
           _forceChangePwd = true;
+          localStorage.setItem('force_pending_' + _uid, '1');
           _pwdHint = '为了账号安全，请先修改默认密码';
         }else if(_loginCount === 1){
           _pwdHint = '建议修改默认密码，保护账号安全';
