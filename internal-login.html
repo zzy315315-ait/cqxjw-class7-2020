@@ -168,6 +168,7 @@ var _u = "https://ekfntkpjqzmkibdimtru.supabase.co";
 var _k = "sb_publishable_Z3wpxD9ZRbXm9-gPPQOGZg_KKhr_yIs";
 var _r = "https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html";
 var _adminUid = "919f3af0-801d-4d7b-87b4-03bedc9d2896";
+var _loginBusy = false;
 
 // 名字→学号映射表
 var _m = {
@@ -249,6 +250,7 @@ function _dn(_email){
 
 // 登录
 function doLogin(){
+  if(_loginBusy) return;
   var _acc = document.getElementById("accInput").value.trim();
   var _pwd = document.getElementById("pwdInput").value;
   var _btn = document.getElementById("loginBtn");
@@ -299,6 +301,7 @@ function doLogin(){
     var _t = _sid; while(_t.length < 6){ _t += _sid; } _pwdSend = _t.slice(0,6);
   }
 
+  _loginBusy = true;
   _btn.disabled = true;
   _btn.innerHTML = '<span class="loading"></span>验证中...';
 
@@ -309,9 +312,6 @@ function doLogin(){
   })
   .then(function(res){ return res.json().then(function(d){ return {status:res.status, data:d}; }); })
   .then(function(result){
-    _btn.disabled = false;
-    _btn.innerHTML = "登 录";
-
     if(result.status === 200 && result.data.access_token){
       var _uid = result.data.user ? result.data.user.id : "";
       var _meta = result.data.user ? result.data.user.user_metadata : null;
@@ -320,6 +320,9 @@ function doLogin(){
 
       // 管理员误入 → 卡住
       if(_r2 === "admin"){
+        _loginBusy = false;
+        _btn.disabled = false;
+        _btn.innerHTML = "登 录";
         showModal("warn","🔒","哎，你是管理员","这个入口是给同学和老师用的<span class='detail'>返回主页，点「是管理员？点这里」进去吧</span>");
         return; // 不跳转，不保存session
       }
@@ -388,9 +391,13 @@ function doLogin(){
       _pwdEl.classList.add("shake");
       setTimeout(function(){_pwdEl.classList.remove("shake")},400);
       showModal("error","❌","登录失败","密码错误，请重新输入<span class='detail'>默认密码是学号，改过的话用新密码</span>");
+      _loginBusy = false;
+      _btn.disabled = false;
+      _btn.innerHTML = "登 录";
     }
   })
   .catch(function(err){
+    _loginBusy = false;
     _btn.disabled = false;
     _btn.innerHTML = "进 入";
     showModal("error","🌐","网络异常","无法连接到服务器，请检查网络连接后重试<span class='detail'>" + err.message + "</span>");
