@@ -290,7 +290,8 @@ function doLogin(){
             uid:uid,
             role:"admin",
             email:email,
-            exp:Date.now() + 3600000
+            exp:Date.now() + 3600000,
+            login_at:Date.now()
           }));
         }catch(e){}
         // 登录成功，清空失败记录

@@ -350,8 +350,18 @@ function doLogin(){
           role:_r2,
           email:_email,
           student_id:_sid,
-          exp:Date.now() + 3600000
+          exp:Date.now() + 3600000,
+          login_at:Date.now()
         }));
+      }catch(e){}
+
+      // 上报一条登录日志（服务端统计登录次数/最近登录时间，失败不影响登录）
+      try{
+        fetch(_u + "/rest/v1/login_logs", {
+          method:"POST",
+          headers:{"apikey":_k, "Authorization":"Bearer "+result.data.access_token, "Content-Type":"application/json", "Prefer":"return=minimal"},
+          body:JSON.stringify({user_id:_uid, name:_name, student_id:_sid, role:_r2, event:'login', created_at:new Date().toISOString()})
+        }).catch(function(){});
       }catch(e){}
 
       // 登录成功，清空失败记录
