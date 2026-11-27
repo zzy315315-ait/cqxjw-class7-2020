@@ -242,6 +242,8 @@
     </div>
     <div class="footer-tip">
       <span class="label">是管理员？</span><a onclick="goAdmin()">点这里</a>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <span class="label">忘记密码？</span><a onclick="goForgot()">点此找回</a>
     </div>
   </div>
 </div>
@@ -313,6 +315,7 @@ function goOther(){ sessionStorage.setItem('from_login','1'); sessionStorage.set
 function goVisitor(){ _verifyThenGo("https://cqxjw-class7-2020-2.pages.dev/visitor.html", true); }
 function goAdmin(){ sessionStorage.setItem('from_login','1'); _verifyThenGo("admin-login.html"); }
 function goRegister(){ sessionStorage.setItem('from_login','1'); _verifyThenGo("register.html"); }
+function goForgot(){ sessionStorage.setItem('from_login','1'); _verifyThenGo("internal-login.html?forgot=1"); }
 
 /* 实时时钟 */
 function updateClock(){

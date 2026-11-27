@@ -149,18 +149,43 @@ sessionStorage.setItem('_v', '1');
 
 <div class="wrap">
   <div class="card">
-    <div class="title">欢迎回来</div>
-    <div class="subtitle">班级成员登录</div>
-    <div class="field">
-      <label>名字</label>
-      <input type="text" id="accInput" placeholder="输入名字、学号或者邮箱都行" autocomplete="off">
+    <div id="loginCard">
+      <div class="title">欢迎回来</div>
+      <div class="subtitle">班级成员登录</div>
+      <div class="field">
+        <label>名字</label>
+        <input type="text" id="accInput" placeholder="输入名字、学号或者邮箱都行" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>密码</label>
+        <input type="password" id="pwdInput" placeholder="默认是学号哦" autocomplete="off">
+      </div>
+      <button class="btn-login" id="loginBtn" onclick="doLogin()">进 入</button>
+      <div class="tip">只有2020级7班的同学和老师能进<br>老师的默认密码是 <b>DENGLAOSHI</b><br>同学初始密码：1位学号重复6遍，2位学号重复3遍<br>例：学号 7 → 777777；学号 22 → 222222</div>
+      <div class="tip" style="margin-top:10px"><a onclick="goForgot()" style="color:#7bc0ff;cursor:pointer;text-decoration:none">忘记密码？点此找回</a></div>
     </div>
-    <div class="field">
-      <label>密码</label>
-      <input type="password" id="pwdInput" placeholder="默认是学号哦" autocomplete="off">
+    <div id="forgotCard" style="display:none">
+      <div class="title">找回密码</div>
+      <div class="subtitle">提交申请后，管理员会尽快为你重置</div>
+      <div class="field">
+        <label>学号</label>
+        <input type="text" id="fSid" placeholder="老师请输入 teacher" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>姓名</label>
+        <input type="text" id="fName" placeholder="请输入姓名" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>新密码</label>
+        <input type="password" id="fPwd" placeholder="请输入新密码（至少6位）" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>确认新密码</label>
+        <input type="password" id="fPwd2" placeholder="请再次输入新密码" autocomplete="off">
+      </div>
+      <button class="btn-login" id="fBtn" onclick="submitReset()">提交申请</button>
+      <div class="tip" style="margin-top:10px"><a onclick="backToLogin()" style="color:#7a8ab5;cursor:pointer;text-decoration:none">← 返回登录</a></div>
     </div>
-    <button class="btn-login" id="loginBtn" onclick="doLogin()">进 入</button>
-    <div class="tip">只有2020级7班的同学和老师能进<br>老师的默认密码是 <b>DENGLAOSHI</b><br>同学初始密码：1位学号重复6遍，2位学号重复3遍<br>例：学号 7 → 777777；学号 22 → 222222</div>
   </div>
 </div>
 
@@ -433,6 +458,60 @@ function doLogin(){
     _btn.disabled = false;
     _btn.innerHTML = "进 入";
     showModal("error","🌐","网络异常","无法连接到服务器，请检查网络连接后重试<span class='detail'>" + err.message + "</span>");
+  });
+}
+
+// ===== 找回密码 =====
+var _sidName = {};
+for(var _n in _m){ _sidName[_m[_n]] = _n; }
+_sidName["teacher"] = "邓老师";
+
+function goForgot(){
+  document.getElementById("loginCard").style.display = "none";
+  document.getElementById("forgotCard").style.display = "block";
+}
+function backToLogin(){
+  document.getElementById("forgotCard").style.display = "none";
+  document.getElementById("loginCard").style.display = "block";
+}
+if(new URLSearchParams(location.search).get('forgot') === '1'){ goForgot(); }
+function submitReset(){
+  var fSid = document.getElementById("fSid");
+  var fName = document.getElementById("fName");
+  var fPwd = document.getElementById("fPwd");
+  var fPwd2 = document.getElementById("fPwd2");
+  var fBtn = document.getElementById("fBtn");
+  var sid = fSid.value.trim(), name = fName.value.trim();
+  var p1 = fPwd.value, p2 = fPwd2.value;
+
+  var last = parseInt(localStorage.getItem('last_reset_submit') || '0');
+  if(Date.now() - last < 300000){
+    showModal("warn","⏳","提交太频繁","请等待几分钟后再提交申请"); return;
+  }
+  if(!sid || !name){ showModal("error","🤔","信息不全","请填写学号和姓名"); return; }
+  if(!p1 || p1.length < 6){ showModal("error","🔑","密码太短","新密码至少 6 位"); return; }
+  if(p1 !== p2){ showModal("error","🔑","两次不一致","两次输入的新密码不一致"); return; }
+  var expected = _sidName[sid];
+  if(!expected){ showModal("error","🔍","学号不存在","请核对学号是否填写正确"); return; }
+  if(expected !== name){ showModal("error","🔍","信息不匹配","学号与姓名不匹配，请核对后再提交"); return; }
+
+  fBtn.disabled = true; fBtn.innerHTML = '<span class="loading"></span>提交中...';
+  fetch(_u + "/rest/v1/password_resets", {
+    method:"POST",
+    headers:{"apikey":_k,"Authorization":"Bearer "+_k,"Content-Type":"application/json","Prefer":"return=minimal"},
+    body:JSON.stringify({student_id:sid, name:name, requested_password:p1, status:"pending"})
+  }).then(function(r){
+    if(r.ok){
+      localStorage.setItem('last_reset_submit', String(Date.now()));
+      showModal("success","✅","申请已提交","管理员会尽快为你重置，请稍后用新密码登录");
+      backToLogin();
+    }else{
+      return r.json().then(function(e){ throw new Error(e.message || e.error || '提交失败'); });
+    }
+  }).catch(function(err){
+    showModal("error","🌐","提交失败", err.message || "网络异常，请稍后再试");
+  }).finally(function(){
+    fBtn.disabled = false; fBtn.innerHTML = "提交申请";
   });
 }
 
